@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Popular Movies</string>
+    <string name="popular">Sort by Popular</string>
+    <string name="share">share</string>
+    <string name="top">Sort by Top Rate</string>
+    <string name="error_Connection">Review Internet Connection</string>
+    <string name="try_again">Try Again,Connection is slow</string>
+
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="fav">Favorite</string>
+    <string name="overview">OverView</string>
+    <string name="review">ٍReviews :</string>
+    <string name="trailers">Trailers :</string>
+</resources>
