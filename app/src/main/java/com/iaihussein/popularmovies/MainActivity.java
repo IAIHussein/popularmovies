@@ -20,8 +20,8 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         // Add the fragment to the 'fragment_container' FrameLayout
-        getSupportFragmentManager().beginTransaction().addToBackStack("main")
-                .add(R.id.fragment, new MainActivityFragment()).commit();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment, new MainActivityFragment()).commit();
 
     }
 
@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         getSupportFragmentManager().executePendingTransactions();
         int count = getSupportFragmentManager().getBackStackEntryCount();
 
-        if (count <= 1) {
+        if (count == 0) {
             finish();
         } else {
             getSupportFragmentManager().popBackStack();
