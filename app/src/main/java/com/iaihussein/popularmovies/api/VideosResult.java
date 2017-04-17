@@ -47,33 +47,33 @@ public class VideosResult {
         this.id = id;
     }
 
-    /**
-     * @return The iso6391
-     */
-    public String getIso6391() {
-        return iso6391;
-    }
-
-    /**
-     * @param iso6391 The iso_639_1
-     */
-    public void setIso6391(String iso6391) {
-        this.iso6391 = iso6391;
-    }
-
-    /**
-     * @return The iso31661
-     */
-    public String getIso31661() {
-        return iso31661;
-    }
-
-    /**
-     * @param iso31661 The iso_3166_1
-     */
-    public void setIso31661(String iso31661) {
-        this.iso31661 = iso31661;
-    }
+//    /**
+//     * @return The iso6391
+//     */
+//    public String getIso6391() {
+//        return iso6391;
+//    }
+//
+//    /**
+//     * @param iso6391 The iso_639_1
+//     */
+//    public void setIso6391(String iso6391) {
+//        this.iso6391 = iso6391;
+//    }
+//
+//    /**
+//     * @return The iso31661
+//     */
+//    public String getIso31661() {
+//        return iso31661;
+//    }
+//
+//    /**
+//     * @param iso31661 The iso_3166_1
+//     */
+//    public void setIso31661(String iso31661) {
+//        this.iso31661 = iso31661;
+//    }
 
     /**
      * @return The key
@@ -82,12 +82,12 @@ public class VideosResult {
         return key;
     }
 
-    /**
-     * @param key The key
-     */
-    public void setKey(String key) {
-        this.key = key;
-    }
+//    /**
+//     * @param key The key
+//     */
+//    public void setKey(String key) {
+//        this.key = key;
+//    }
 
     /**
      * @return The name
@@ -110,26 +110,26 @@ public class VideosResult {
         return site;
     }
 
-    /**
-     * @param site The site
-     */
-    public void setSite(String site) {
-        this.site = site;
-    }
-
-    /**
-     * @return The size
-     */
-    public Integer getSize() {
-        return size;
-    }
-
-    /**
-     * @param size The size
-     */
-    public void setSize(Integer size) {
-        this.size = size;
-    }
+//    /**
+//     * @param site The site
+//     */
+//    public void setSite(String site) {
+//        this.site = site;
+//    }
+//
+//    /**
+//     * @return The size
+//     */
+//    public Integer getSize() {
+//        return size;
+//    }
+//
+//    /**
+//     * @param size The size
+//     */
+//    public void setSize(Integer size) {
+//        this.size = size;
+//    }
 
     /**
      * @return The type
@@ -138,10 +138,10 @@ public class VideosResult {
         return type;
     }
 
-    /**
-     * @param type The type
-     */
-    public void setType(String type) {
-        this.type = type;
-    }
+//    /**
+//     * @param type The type
+//     */
+//    public void setType(String type) {
+//        this.type = type;
+//    }
 }
