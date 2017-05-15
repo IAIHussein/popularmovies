@@ -12,6 +12,7 @@ public class Var {
             URL_TOP = URL_BASE + "top_rated" + KEY,
             URL_IMAGE = "http://image.tmdb.org/t/p/w185",
             ARG_EXTRA = "movie",
-            URL_YOUTUBE = "http://www.youtube.com/watch?v=";
+            URL_YOUTUBE = "http://www.youtube.com/watch?v=",
+            DETAIL = "DETAIL";
 
 }

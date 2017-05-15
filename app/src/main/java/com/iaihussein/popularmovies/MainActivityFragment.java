@@ -32,6 +32,7 @@ public class MainActivityFragment extends Fragment {
     GridView mGridView;
     ImageAdapter mImageAdapter;
 
+
     public MainActivityFragment() {
 
     }
@@ -55,13 +56,29 @@ public class MainActivityFragment extends Fragment {
                 Bundle mBundle = new Bundle();
                 mBundle.putInt(Var.ARG_EXTRA, i);
                 mDetailsFragment.setArguments(mBundle);
+                MainActivity.sIndex = String.valueOf(i);
                 if (getActivity().findViewById(R.id.detail_fragment) == null)
                     getFragmentManager().beginTransaction().addToBackStack("detail").replace(R.id.fragment, mDetailsFragment).commit();
                 else
                     getFragmentManager().beginTransaction().replace(R.id.detail_fragment, mDetailsFragment).commit();
             }
         });
-        getAdapterData(Var.URL_POPULAR);
+        if (MainActivity.sType == null || MainActivity.sType.equalsIgnoreCase(getString(R.string.popular)))
+            getAdapterData(Var.URL_POPULAR);
+        else if (MainActivity.sType.equalsIgnoreCase(getString(R.string.top)))
+            getAdapterData(Var.URL_TOP);
+        else if (new DBDataSource(getContext()).getAll() != null) {
+            MainActivity.mResultList = new DBDataSource(getContext()).getAll();
+
+            if (mImageAdapter == null) {
+                mImageAdapter = new ImageAdapter(getContext(), MainActivity.mResultList);
+                mGridView.setAdapter(mImageAdapter);
+            } else {
+                mImageAdapter.mResultList = MainActivity.mResultList;
+                mImageAdapter.notifyDataSetChanged();
+            }
+        }
+
 
         return mView;
     }
@@ -100,6 +117,7 @@ public class MainActivityFragment extends Fragment {
         };
     }
 
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.clear();
@@ -115,11 +133,12 @@ public class MainActivityFragment extends Fragment {
 
         if (id == R.id.action_popular) {
             getAdapterData(Var.URL_POPULAR);
+            MainActivity.sType = getString(R.string.popular);
             return true;
         }
         if (id == R.id.action_top) {
             getAdapterData(Var.URL_TOP);
-
+            MainActivity.sType = getString(R.string.top);
             return true;
         }
         if (id == R.id.action_fav) {
@@ -135,7 +154,7 @@ public class MainActivityFragment extends Fragment {
                     mImageAdapter.notifyDataSetChanged();
                 }
             }
-
+            MainActivity.sType = getString(R.string.fav);
             return true;
         }
         return super.onOptionsItemSelected(item);

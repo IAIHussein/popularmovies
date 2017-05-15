@@ -12,6 +12,8 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     static List<Result> mResultList;
+    static String sType;
+    static String sIndex;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,9 +21,18 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        // Add the fragment to the 'fragment_container' FrameLayout
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment, new MainActivityFragment()).commit();
+        if (sIndex != null) {
+            DetailsFragment mDetailsFragment = new DetailsFragment();
+            Bundle mBundle = new Bundle();
+            mBundle.putInt(Var.ARG_EXTRA, Integer.parseInt(sIndex));
+            mDetailsFragment.setArguments(mBundle);
+            if (findViewById(R.id.detail_fragment) == null)
+                getSupportFragmentManager().beginTransaction().addToBackStack("detail").replace(R.id.fragment, mDetailsFragment).commit();
+            else
+                getSupportFragmentManager().beginTransaction().replace(R.id.detail_fragment, mDetailsFragment).commit();
+        } else
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment, new MainActivityFragment()).commit();
 
     }
 
@@ -46,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
             getSupportFragmentManager().popBackStack();
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment, new MainActivityFragment()).commit();
+            sIndex = null;
         }
     }
 }

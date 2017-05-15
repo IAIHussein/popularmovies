@@ -74,7 +74,7 @@ public class DBDataSource {
         values.put(DBSQLiteHelper.COLUMN_Contact, contact);
         values.put(DBSQLiteHelper.COLUMN_FOV_ID, id);
         values.put(DBSQLiteHelper.COLUMN_TYPE, mTrailerType);
-         database
+        database
                 .insert(DBSQLiteHelper.TABLE_NAME, null, values);
         close();
     }
