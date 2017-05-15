@@ -5,7 +5,7 @@ package com.iaihussein.popularmovies;
  */
 public class Var {
     final static String RESULTS = "results", URL_BASE = "https://api.themoviedb.org/3/movie/",
-            KEY = "?api_key=",//the api key
+            KEY = "?api_key=7e4e2d265e8739afc0fd5716ea3c4f50",//the api key
             REVIEWS = "/reviews",
             VIDEOS = "/videos",
             URL_POPULAR = URL_BASE + "popular" + KEY,
