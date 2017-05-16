@@ -244,7 +244,7 @@ public class DetailsFragment extends Fragment {
     private String getTrailer(String id) {
 
         Cursor cursor = getActivity().getContentResolver().query(Var.CONTENT_URI, null,
-                DBSQLiteHelper.COLUMN_FOV_ID + " = ? and " + DBSQLiteHelper.COLUMN_TYPE + "= ?", new String[]{id, Var.REVIEW_TYPE}, null);
+                DBSQLiteHelper.COLUMN_FOV_ID + " = ? and " + DBSQLiteHelper.COLUMN_TYPE + "= ?", new String[]{id, Var.TRAILER_TYPE}, null);
 
         cursor.moveToFirst();
         String m = "";
