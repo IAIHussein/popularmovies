@@ -1,7 +1,9 @@
 package com.iaihussein.popularmovies;
 
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -25,7 +27,7 @@ import com.iaihussein.popularmovies.api.InternetConnection;
 import com.iaihussein.popularmovies.api.Result;
 import com.iaihussein.popularmovies.api.ReviewResult;
 import com.iaihussein.popularmovies.api.VideosResult;
-import com.iaihussein.popularmovies.database.DBDataSource;
+import com.iaihussein.popularmovies.database.DBSQLiteHelper;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
@@ -45,7 +47,6 @@ public class DetailsFragment extends Fragment {
     ListView mReviewListView, mVideosListView;
     ReviewsAdapter mReviewsAdapter;
     VideosAdapter mVideosAdapter;
-    DBDataSource mDBDataSource;
     String mReview, mTrailer;
 
     @Override
@@ -74,28 +75,32 @@ public class DetailsFragment extends Fragment {
         mYearTextView.setText(mResult.getReleaseDate());
         mOverViewTextView.setText(mResult.getOverview());
 
-        mDBDataSource = new DBDataSource(getContext());
-        if (mDBDataSource.isExist("" + mResult.getId())) {
+        if (isExist("" + mResult.getId())) {
             mFavoriteButton.setText("Remove Favorite");
-            mReviewResultList = new Gson().fromJson(
-                    mDBDataSource.getReview("" + mResult.getId()),
-                    new TypeToken<List<ReviewResult>>() {
-                    }.getType());
-            mReviewsAdapter = new ReviewsAdapter(getContext(), mReviewResultList);
-            mReviewListView.setAdapter(mReviewsAdapter);
-
-            mVideosResultList = new Gson().fromJson(
-                    mDBDataSource.getTrailer("" + mResult.getId()),
-                    new TypeToken<List<VideosResult>>() {
-                    }.getType());
-            mVideosAdapter = new VideosAdapter(getContext(), mVideosResultList);
-            mVideosListView.setAdapter(mVideosAdapter);
-            mVideosListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(Var.URL_YOUTUBE + mVideosAdapter.mResultList.get(i).getKey())));
-                }
-            });
+            String mReviews = getReview("" + mResult.getId());
+            if (null != mReviews && "".equalsIgnoreCase(mReviews)) {
+                mReviewResultList = new Gson().fromJson(
+                        mReviews,
+                        new TypeToken<List<ReviewResult>>() {
+                        }.getType());
+                mReviewsAdapter = new ReviewsAdapter(getContext(), mReviewResultList);
+                mReviewListView.setAdapter(mReviewsAdapter);
+            }
+            String mVideos = getTrailer("" + mResult.getId());
+            if (null != mVideos && "".equalsIgnoreCase(mVideos)) {
+                mVideosResultList = new Gson().fromJson(
+                        mVideos,
+                        new TypeToken<List<VideosResult>>() {
+                        }.getType());
+                mVideosAdapter = new VideosAdapter(getContext(), mVideosResultList);
+                mVideosListView.setAdapter(mVideosAdapter);
+                mVideosListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(Var.URL_YOUTUBE + mVideosAdapter.mResultList.get(i).getKey())));
+                    }
+                });
+            }
         } else {
             mFavoriteButton.setText("Add Favorite");
             getAdapterData(mResult.getId().toString());
@@ -103,16 +108,30 @@ public class DetailsFragment extends Fragment {
         mFavoriteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mDBDataSource.isExist("" + mResult.getId())) {
-                    mDBDataSource.deleteFavoriteById("" + mResult.getId());
+                if (isExist("" + mResult.getId())) {
+                    deleteFavoriteById("" + mResult.getId());
                     mFavoriteButton.setText("Add Favorite");
                 } else {
                     mFavoriteButton.setText("Remove Favorite");
-                    mDBDataSource.createMovie(new Gson().toJson(mResult), "" + mResult.getId());
-                    if (mReview != null && !mReview.isEmpty())
-                        mDBDataSource.createReview(mReview, "" + mResult.getId());
-                    if (mTrailer != null && !mTrailer.isEmpty())
-                        mDBDataSource.createTrailer(mTrailer, "" + mResult.getId());
+                    ContentValues values = new ContentValues();
+                    values.put(DBSQLiteHelper.COLUMN_Contact, new Gson().toJson(mResult));
+                    values.put(DBSQLiteHelper.COLUMN_FOV_ID, "" + mResult.getId());
+                    values.put(DBSQLiteHelper.COLUMN_TYPE, Var.MOVIE_TYPE);
+                    getActivity().getContentResolver().insert(Var.CONTENT_URI, values);
+                    if (mReview != null && !mReview.isEmpty()) {
+                        ContentValues valuesReview = new ContentValues();
+                        values.put(DBSQLiteHelper.COLUMN_Contact, mReview);
+                        values.put(DBSQLiteHelper.COLUMN_FOV_ID, "" + mResult.getId());
+                        values.put(DBSQLiteHelper.COLUMN_TYPE, Var.REVIEW_TYPE);
+                        getActivity().getContentResolver().insert(Var.CONTENT_URI, valuesReview);
+                    }
+                    if (mTrailer != null && !mTrailer.isEmpty()) {
+                        ContentValues valuesTrailer = new ContentValues();
+                        values.put(DBSQLiteHelper.COLUMN_Contact, mTrailer);
+                        values.put(DBSQLiteHelper.COLUMN_FOV_ID, "" + mResult.getId());
+                        values.put(DBSQLiteHelper.COLUMN_TYPE, Var.TRAILER_TYPE);
+                        getActivity().getContentResolver().insert(Var.CONTENT_URI, valuesTrailer);
+                    }
                 }
             }
         });
@@ -209,4 +228,53 @@ public class DetailsFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
+    private String getReview(String id) {
+
+        Cursor cursor = getActivity().getContentResolver().query(Var.CONTENT_URI, null,
+                DBSQLiteHelper.COLUMN_FOV_ID + " = ? and " + DBSQLiteHelper.COLUMN_TYPE + "= ?", new String[]{id, Var.REVIEW_TYPE}, null);
+
+        cursor.moveToFirst();
+        String m = "";
+        if (!cursor.isAfterLast())
+            m = cursor.getString(cursor
+                    .getColumnIndex(DBSQLiteHelper.COLUMN_Contact));
+        return m;
+    }
+
+    private String getTrailer(String id) {
+
+        Cursor cursor = getActivity().getContentResolver().query(Var.CONTENT_URI, null,
+                DBSQLiteHelper.COLUMN_FOV_ID + " = ? and " + DBSQLiteHelper.COLUMN_TYPE + "= ?", new String[]{id, Var.REVIEW_TYPE}, null);
+
+        cursor.moveToFirst();
+        String m = "";
+        if (!cursor.isAfterLast())
+            m = cursor.getString(cursor
+                    .getColumnIndex(DBSQLiteHelper.COLUMN_Contact));
+        return m;
+    }
+
+    private Boolean isExist(String id) {
+
+        Cursor cursor = getActivity().getContentResolver().query(Var.CONTENT_URI, null,
+                null, null, null, null);
+
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            if ((cursor.getString(cursor.getColumnIndex(DBSQLiteHelper.COLUMN_FOV_ID)).equalsIgnoreCase(id))) {
+                cursor.close();
+                return true;
+            }
+            cursor.moveToNext();
+        }
+        // Make sure to close the cursor
+        cursor.close();
+        return false;
+    }
+
+    private void deleteFavoriteById(String id) {
+        getActivity().getContentResolver().delete(Var.CONTENT_URI,
+                DBSQLiteHelper.COLUMN_FOV_ID + " = ?",
+                new String[]{id});
+    }
 }

@@ -21,6 +21,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <provider
+            android:authorities="com.iaihussein.popularmovies"
+            android:name="com.iaihussein.popularmovies.database.DataContentProvider"
+            android:exported="false"/>
     </application>
-
 </manifest>

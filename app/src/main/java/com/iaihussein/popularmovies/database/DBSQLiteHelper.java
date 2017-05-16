@@ -9,7 +9,6 @@ public class DBSQLiteHelper extends SQLiteOpenHelper {
     public static final String TABLE_NAME = "FavoriteTable", COLUMN_ID = "Id",
             COLUMN_Contact = "Contact", COLUMN_TYPE = "Type",
             COLUMN_FOV_ID = "FavoriteID";
-
     private static final String DATABASE_NAME = "Numbers.db";
     private static final int DATABASE_VERSION = 1;
 

@@ -1,5 +1,6 @@
 package com.iaihussein.popularmovies;
 
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -18,11 +19,12 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.iaihussein.popularmovies.api.InternetConnection;
 import com.iaihussein.popularmovies.api.Result;
-import com.iaihussein.popularmovies.database.DBDataSource;
+import com.iaihussein.popularmovies.database.DBSQLiteHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -67,18 +69,18 @@ public class MainActivityFragment extends Fragment {
             getAdapterData(Var.URL_POPULAR);
         else if (MainActivity.sType.equalsIgnoreCase(getString(R.string.top)))
             getAdapterData(Var.URL_TOP);
-        else if (new DBDataSource(getContext()).getAll() != null) {
-            MainActivity.mResultList = new DBDataSource(getContext()).getAll();
-
-            if (mImageAdapter == null) {
-                mImageAdapter = new ImageAdapter(getContext(), MainActivity.mResultList);
-                mGridView.setAdapter(mImageAdapter);
-            } else {
-                mImageAdapter.mResultList = MainActivity.mResultList;
-                mImageAdapter.notifyDataSetChanged();
+        else {
+            MainActivity.mResultList = getAll();
+            if (MainActivity.mResultList != null) {
+                if (mImageAdapter == null) {
+                    mImageAdapter = new ImageAdapter(getContext(), MainActivity.mResultList);
+                    mGridView.setAdapter(mImageAdapter);
+                } else {
+                    mImageAdapter.mResultList = MainActivity.mResultList;
+                    mImageAdapter.notifyDataSetChanged();
+                }
             }
         }
-
 
         return mView;
     }
@@ -143,8 +145,9 @@ public class MainActivityFragment extends Fragment {
         }
         if (id == R.id.action_fav) {
 
-            if (new DBDataSource(getContext()).getAll() != null) {
-                MainActivity.mResultList = new DBDataSource(getContext()).getAll();
+            MainActivity.mResultList = getAll();
+            if (MainActivity.mResultList != null) {
+
 
                 if (mImageAdapter == null) {
                     mImageAdapter = new ImageAdapter(getContext(), MainActivity.mResultList);
@@ -158,5 +161,28 @@ public class MainActivityFragment extends Fragment {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private List<Result> getAll() {
+
+        List<Result> mResultList = new ArrayList<>();
+
+        Cursor cursor = getActivity().getContentResolver().query(Var.CONTENT_URI, null,
+                DBSQLiteHelper.COLUMN_TYPE + " = ? ", new String[]{Var.MOVIE_TYPE}, null);
+
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            Result mResult = cursorToResult(cursor);
+            mResultList.add(mResult);
+            cursor.moveToNext();
+        }
+        // Make sure to close the cursor
+        cursor.close();
+        return mResultList;
+    }
+
+    private Result cursorToResult(Cursor cursor) {
+        return new Gson().fromJson(cursor.getString(cursor
+                .getColumnIndex(DBSQLiteHelper.COLUMN_Contact)), Result.class);
     }
 }
